@@ -1,0 +1,23 @@
+# Requirements for Ubuntu/Linux environment - V2.ipynb OPTIMIZED
+# Generated from V2.ipynb import analysis
+# Python 3.10.12
+
+# Core packages actually used in V2.ipynb
+darts==0.37.1
+joblib==1.5.2
+matplotlib==3.10.5
+numpy==2.2.6
+pandas==2.3.2
+pandas-datareader==0.10.0
+plotly==6.3.0
+scikit-learn==1.7.1
+seaborn==0.13.2
+statsmodels==0.14.5
+tensorflow==2.20.0
+torch==2.8.0
+tqdm==4.67.1
+
+# System info from original venv:
+# home = /home/viethung/anhthu/.venv/bin
+# include-system-site-packages = false
+# version = 3.10.12
