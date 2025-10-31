@@ -298,27 +298,58 @@ class NotebookTranslator:
         return line, ""
     
     def translate_code_cell(self, source_lines):
-        """Translate comments in code cell source."""
+        """Translate comments and docstrings in code cell source."""
         translated_lines = []
         
         for line in source_lines:
-            code_part, comment_part = self.extract_comment_from_line(line)
+            translated_line = line
             
-            if comment_part and len(comment_part) > 1:  # Has a comment (more than just #)
-                # Extract the # and any whitespace
-                match = re.match(r'^(#\s*)', comment_part)
-                if match:
-                    comment_prefix = match.group(1)
-                    comment_text = comment_part[len(comment_prefix):]
-                    
-                    # Translate the comment text
-                    translated_text = self.translate_text(comment_text)
-                    translated_line = code_part + comment_prefix + translated_text
-                    translated_lines.append(translated_line)
-                else:
-                    translated_lines.append(line)
+            # Handle docstrings (triple quotes)
+            if '"""' in line:
+                # Extract and translate content within triple quotes
+                parts = line.split('"""')
+                for i, part in enumerate(parts):
+                    if i % 2 == 1:  # Odd indices are inside docstrings
+                        parts[i] = self.translate_text(part)
+                translated_line = '"""'.join(parts)
+            elif "'''" in line:
+                # Handle triple single quotes
+                parts = line.split("'''")
+                for i, part in enumerate(parts):
+                    if i % 2 == 1:
+                        parts[i] = self.translate_text(part)
+                translated_line = "'''".join(parts)
             else:
-                translated_lines.append(line)
+                # Handle regular comments
+                code_part, comment_part = self.extract_comment_from_line(line)
+                
+                if comment_part and len(comment_part) > 1:  # Has a comment (more than just #)
+                    # Extract the # and any whitespace
+                    match = re.match(r'^(#\s*)', comment_part)
+                    if match:
+                        comment_prefix = match.group(1)
+                        comment_text = comment_part[len(comment_prefix):]
+                        
+                        # Translate the comment text
+                        translated_text = self.translate_text(comment_text)
+                        translated_line = code_part + comment_prefix + translated_text
+            
+            # Also handle string literals in print statements
+            if 'print(' in translated_line or 'print (' in translated_line:
+                # Translate content within string literals
+                # Match both single and double quoted strings
+                def translate_string(match):
+                    quote = match.group(1)
+                    content = match.group(2)
+                    translated_content = self.translate_text(content)
+                    return f'{quote}{translated_content}{quote}'
+                
+                # Handle double-quoted strings
+                translated_line = re.sub(r'(")([^"]*?)"', translate_string, translated_line)
+                # Handle f-strings (but be careful with format specifiers)
+                # We'll leave f-strings as is for now to avoid breaking format specs
+            
+            translated_lines.append(translated_line)
         
         return translated_lines
     
