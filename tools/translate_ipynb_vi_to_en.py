@@ -300,27 +300,58 @@ class NotebookTranslator:
     def translate_code_cell(self, source_lines):
         """Translate comments and docstrings in code cell source."""
         translated_lines = []
+        in_docstring = False
+        docstring_delimiter = None
         
         for line in source_lines:
             translated_line = line
             
-            # Handle docstrings (triple quotes)
-            if '"""' in line:
-                # Extract and translate content within triple quotes
-                parts = line.split('"""')
-                for i, part in enumerate(parts):
-                    if i % 2 == 1:  # Odd indices are inside docstrings
-                        parts[i] = self.translate_text(part)
-                translated_line = '"""'.join(parts)
-            elif "'''" in line:
-                # Handle triple single quotes
-                parts = line.split("'''")
-                for i, part in enumerate(parts):
-                    if i % 2 == 1:
-                        parts[i] = self.translate_text(part)
-                translated_line = "'''".join(parts)
+            # Check for docstring delimiters (""" or ''')
+            triple_double_count = line.count('"""')
+            triple_single_count = line.count("'''")
+            
+            # Handle multi-line docstrings
+            if triple_double_count > 0 or triple_single_count > 0:
+                # Determine which delimiter
+                if triple_double_count > 0:
+                    delimiter = '"""'
+                    count = triple_double_count
+                else:
+                    delimiter = "'''"
+                    count = triple_single_count
+                
+                # If we're starting or ending a docstring
+                if count == 1:
+                    if not in_docstring:
+                        # Starting docstring
+                        in_docstring = True
+                        docstring_delimiter = delimiter
+                        # Translate content after the opening delimiter
+                        parts = line.split(delimiter, 1)
+                        if len(parts) == 2:
+                            translated_content = self.translate_text(parts[1])
+                            translated_line = parts[0] + delimiter + translated_content
+                    else:
+                        # Ending docstring
+                        # Translate content before the closing delimiter
+                        parts = line.split(delimiter, 1)
+                        if len(parts) == 2:
+                            translated_content = self.translate_text(parts[0])
+                            translated_line = translated_content + delimiter + parts[1]
+                        in_docstring = False
+                        docstring_delimiter = None
+                elif count == 2:
+                    # Single-line docstring
+                    parts = line.split(delimiter)
+                    if len(parts) >= 3:
+                        # Translate the middle part
+                        parts[1] = self.translate_text(parts[1])
+                        translated_line = delimiter.join(parts)
+            elif in_docstring:
+                # We're inside a multi-line docstring - translate the entire line
+                translated_line = self.translate_text(line)
             else:
-                # Handle regular comments
+                # Not in a docstring - handle regular comments
                 code_part, comment_part = self.extract_comment_from_line(line)
                 
                 if comment_part and len(comment_part) > 1:  # Has a comment (more than just #)
@@ -333,21 +364,18 @@ class NotebookTranslator:
                         # Translate the comment text
                         translated_text = self.translate_text(comment_text)
                         translated_line = code_part + comment_prefix + translated_text
-            
-            # Also handle string literals in print statements
-            if 'print(' in translated_line or 'print (' in translated_line:
-                # Translate content within string literals
-                # Match both single and double quoted strings
-                def translate_string(match):
-                    quote = match.group(1)
-                    content = match.group(2)
-                    translated_content = self.translate_text(content)
-                    return f'{quote}{translated_content}{quote}'
                 
-                # Handle double-quoted strings
-                translated_line = re.sub(r'(")([^"]*?)"', translate_string, translated_line)
-                # Handle f-strings (but be careful with format specifiers)
-                # We'll leave f-strings as is for now to avoid breaking format specs
+                # Also handle string literals in print statements
+                if 'print(' in translated_line or 'print (' in translated_line:
+                    # Translate content within string literals
+                    def translate_string(match):
+                        quote = match.group(1)
+                        content = match.group(2)
+                        translated_content = self.translate_text(content)
+                        return f'{quote}{translated_content}{quote}'
+                    
+                    # Handle double-quoted strings
+                    translated_line = re.sub(r'(")([^"]*?)"', translate_string, translated_line)
             
             translated_lines.append(translated_line)
         
