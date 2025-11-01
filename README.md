@@ -21,10 +21,10 @@ This project was developed as part of the Advanced Data Analytics course by Hoan
 ## Overview
 This project implements a Long Short-Term Memory (LSTM) model for forecasting daily store sales. The task is framed as supervised learning with a sliding window over time and optional exogenous features.
 
-- Problem formulation: fixed-length lookback windows of past sales (and optional exogenous signals such as calendar/holiday indicators and rolling statistics) are used to predict the next step or a short multi-step horizon.
-- Model: a single or stacked LSTM with dropout to capture temporal dependencies; trained as a global model across multiple series (e.g., stores/product families) to share seasonal and trend structure.
+- Problem formulation: fixed-length lookback windows of past sales (and optional exogenous signals such as calendar/holiday indicators and rolling statistics) are used to predict the next step
+- Model: a stacked LSTM with dropout to capture temporal dependencies; trained as a global model across multiple series (e.g., stores/product families) to share seasonal and trend structure.
 - Training protocol: strictly time-respecting splits; normalization/encoding fit only on the training period; early stopping and model checkpointing based on validation performance.
-- Evaluation: time-aware validation (rolling-origin/backtesting or single chronological holdout) with appropriate error metrics (RMSE, MAE, MAPE).
+- Evaluation: time-aware validation (rolling-origin/backtesting or single chronological holdout) with appropriate error metric (RMLSE: RMSE of log y).
 
 ---
 
@@ -47,9 +47,9 @@ Grounded in the LSTM approach above, the pipeline focuses on:
 - Global LSTM training:
   - Train a single LSTM across multiple related series to leverage shared patterns and improve data efficiency.
 - Windowing and targets:
-  - Consistent sliding windows for inputs (lookback) and clearly defined forecast horizon (1-step or short multi-step).
+  - Consistent sliding windows for inputs (lookback) and clearly defined forecast horizon (1-step).
 - Feature pipeline (exogenous + lags):
-  - Lag features (e.g., t−1, t−7, t−14) and rolling stats (mean/std) computed from past data only.
+  - Lag features (t−7, t−14) computed from past data only.
   - Calendar/holiday features where applicable to encode seasonality and events.
 - Leakage-safe preprocessing:
   - Fit scalers/encoders exclusively on the training split; apply the fitted transforms to validation/test.
@@ -59,7 +59,7 @@ Grounded in the LSTM approach above, the pipeline focuses on:
   - Seed control; optional learning-rate scheduling during training.
 - Time-aware evaluation:
   - Rolling-origin backtesting or a chronological holdout.
-  - Report RMSE/MAE/MAPE on validation and test segments.
+  - Report RMLSE on validation and 2 test segments to test model drift
 
 ---
 
