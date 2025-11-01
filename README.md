@@ -22,7 +22,7 @@ This project was developed as part of the Advanced Data Analytics course by Hoan
 This project implements a Long Short-Term Memory (LSTM) model for forecasting daily store sales. The task is framed as supervised learning with a sliding window over time and optional exogenous features.
 
 - Problem formulation: fixed-length lookback windows of past sales (and optional exogenous signals such as calendar/holiday indicators and rolling statistics) are used to predict the next step
-- Model: a stacked LSTM with dropout to capture temporal dependencies; trained as a global model across multiple series (e.g., stores/product families) to share seasonal and trend structure.
+- Model: a stacked LSTM with dropout to capture temporal dependencies; trained as a global model across multiple series (stores/product families) to share seasonal and trend structure.
 - Training protocol: strictly time-respecting splits; normalization/encoding fit only on the training period; early stopping and model checkpointing based on validation performance.
 - Evaluation: time-aware validation (rolling-origin/backtesting or single chronological holdout) with appropriate error metric (RMLSE: RMSE of log y).
 
@@ -45,7 +45,7 @@ Please follow Kaggle’s terms when downloading and using the data.
 Grounded in the LSTM approach above, the pipeline focuses on:
 
 - Global LSTM training:
-  - Train a single LSTM across multiple related series to leverage shared patterns and improve data efficiency.
+  - Train a single LSTM model across multiple related time series to capture shared temporal patterns and improve data efficiency, while ensuring that each store–product family sequence is kept distinct and not mixed with others.
 - Windowing and targets:
   - Consistent sliding windows for inputs (lookback) and clearly defined forecast horizon (1-step).
 - Feature pipeline (exogenous + lags):
