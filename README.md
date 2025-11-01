@@ -24,9 +24,10 @@ The goal of this project is to build a robust time series forecasting pipeline t
 Highlights:
 - Construct clean, leak-free train/validation/test splits that respect time order
 - Engineer informative time-based features (lags, rolling statistics, calendar/holiday signals)
-- Train deep learning models and compare their performance
-- Ensure reproducibility with a single notebook workflow
-
+- Sử dụng hint của cuộc thi Wages in the public sector are paid every two weeks on the 15 th and on the last day of the month. Supermarket sales could be affected by this.
+A magnitude 7.8 earthquake struck Ecuador on April 16, 2016. People rallied in relief efforts donating water and other first need products which greatly affected supermarket sales for several weeks after the earthquake.
+- Train deep learning model and compare the performance giữa 2 tập test để kiểm tra model drift
+- Nhận xét post forecasting
 ---
 
 ## Dataset
@@ -43,7 +44,7 @@ This work is aligned with the Kaggle competition problem setup and data schema:
 
 ---
 
-## Key Improvements
+## Key Improvements (dựa vào overview)
 The pipeline emphasizes good time-series modeling hygiene and generalization:
 
 - Temporal splits and validation:
