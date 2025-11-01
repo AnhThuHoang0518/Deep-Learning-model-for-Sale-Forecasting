@@ -4,4 +4,6 @@ Link data: https://www.kaggle.com/competitions/store-sales-time-series-forecasti
 
 File code cuối (tiếng anh): https://github.com/AnhThuHoang0518/Deep-Learning-model-for-Sale-Forecasting/blob/main/Final5.ipynb
 
-File best model: https://github.com/AnhThuHoang0518/Deep-Learning-model-for-Sale-Forecasting/blob/main/best_lstm_tf1.keras
+# Ack
+Course: Advanced Data Analytics
+Authors: Hoang Anh Thu, Nguyen Quynh Chi and Le Hai Anh
