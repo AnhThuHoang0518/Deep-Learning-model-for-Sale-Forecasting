@@ -49,7 +49,7 @@ Grounded in the LSTM approach above, the pipeline focuses on:
 - Windowing and targets:
   - Consistent sliding windows for inputs (lookback) and clearly defined forecast horizon (1-step).
 - Feature pipeline (exogenous + lags):
-  - Lag features (t−7, t−14) computed from past data only.
+  - Lag features (t−7, t−33) computed from past data.
   - Calendar/holiday features where applicable to encode seasonality and events.
 - Leakage-safe preprocessing:
   - Fit scalers/encoders exclusively on the training split; apply the fitted transforms to validation/test.
